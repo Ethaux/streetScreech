@@ -85,7 +85,7 @@ void controls() {
   }
   
   //moves car forward
-  if (vOffset/400 > 0) {
+  if ((int) vOffset > 400) {
       carY = carY - 1;
    }
 }
