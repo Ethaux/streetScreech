@@ -2,15 +2,16 @@ import processing.sound.*;
 
 FFT fft;
 AudioIn in;
-int bands = 4;
+int bands = 2048;
 float[] spectrum = new float[bands];
 int maxIndex = 0;
 float max = 0.0;
 
 
 void setup() {
-  size(512, 360);
+  size(1024, 360);
   background(255);
+  max = spectrum[0];
     
   // Create an Input stream which is routed into the Amplitude analyzer
   fft = new FFT(this, bands);
@@ -38,5 +39,5 @@ void draw() {
     }
   }
   
-  println(maxIndex);
+  println(maxIndex*44100/1024);
 }
