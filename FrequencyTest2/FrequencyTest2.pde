@@ -2,8 +2,11 @@ import processing.sound.*;
 
 FFT fft;
 AudioIn in;
-int bands = 512;
+int bands = 4;
 float[] spectrum = new float[bands];
+int maxIndex = 0;
+float max = 0.0;
+
 
 void setup() {
   size(512, 360);
@@ -23,10 +26,17 @@ void setup() {
 void draw() { 
   background(255);
   fft.analyze(spectrum);
+  max = spectrum[0];
 
   for(int i = 0; i < bands; i++){
-  // The result of the FFT is normalized
-  // draw the line for frequency band i scaling it up by 5 to get more amplitude.
-  line( i, height, i, height - spectrum[i]*height*5 );
-  } 
+    // The result of the FFT is normalized
+    // draw the line for frequency band i scaling it up by 5 to get more amplitude.
+    //line( i, height, i, height - spectrum[i]*height*5 );
+    if(spectrum[i] > max) {
+      max = spectrum[i];
+      maxIndex = i;
+    }
+  }
+  
+  println(maxIndex);
 }

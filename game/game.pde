@@ -10,8 +10,11 @@ PFont f;
 
 PImage map;
 PImage car;
-int carX = 0;
-int carY = 0;
+float carX = 0;
+float carY = 0;
+float carDirection = 0;
+String speedStr = "";
+float speed = 0.0;
 
 int click = 0;
 
@@ -78,10 +81,11 @@ void controls() {
     carY = height;
   }
   
-  String speedStr = nf(amp.analyze(), 0, 4);
-  float speed = float(speedStr) * 10;
-  println(speed);
-  carY = carY - int(speed);
+  speedStr = nf(amp.analyze(), 0, 4);
+  speed = float(speedStr) * 10;
+  //println(speed);
+  carX = carX + speed*sin(radians(carDirection));
+  carY = carY - speed*cos(radians(carDirection));
   
   //int vOffset = 0;
   //for(int i = 0; i < width; i++)
@@ -101,6 +105,12 @@ void controls() {
   //if ((int) vOffset > 400) {
   //    carY = carY - 1;
   //}
+  
+  pushMatrix();
+  translate(carX+car.width/2, carY+car.height/2);
+  rotate(radians(carDirection));
+  image(car, -car.width/2, -car.height/2);
+  popMatrix();
 }
 
 void startScreen() {
@@ -122,6 +132,14 @@ void startScreen() {
 
 void firstLevel() {
   image(map, 0, 0); //first level bg
-  image(car, carX, carY);
+  //image(car, carX, carY);
   controls();
+}
+
+void keyPressed() {
+  if(keyCode == LEFT){
+    carDirection -= 5;
+  } else if(keyCode == RIGHT) {
+    carDirection += 5;
+  }
 }
