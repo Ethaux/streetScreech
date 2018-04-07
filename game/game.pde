@@ -2,6 +2,9 @@
 // LMC 4725
 
 import beads.*;
+import processing.sound.*;
+Amplitude amp;
+AudioIn in;
 AudioContext ac;
 PFont f;
 
@@ -24,21 +27,26 @@ void setup() {
   carX = width/2 - 17;
   carY = height - car.height;
   
-  //sound
-  ac = new AudioContext();
-  // get an AudioInput UGen from the AudioContext
-  // this will setup an input from whatever input is your 
-  // default audio input (usually the microphone in)
-  // changing audio inputs in beads is a little bit janky (as
-  // of this writing)
-  // so it's best to change your default input temporarily, 
-  // if you want to use a different input
-  UGen microphoneIn = ac.getAudioInput();
-  // set up our usual master gain object
-  Gain g = new Gain(ac, 1, 0.5);
-  g.addInput(microphoneIn);
-  ac.out.addInput(g);
-  ac.start();
+  ////sound
+  //ac = new AudioContext();
+  //// get an AudioInput UGen from the AudioContext
+  //// this will setup an input from whatever input is your 
+  //// default audio input (usually the microphone in)
+  //// changing audio inputs in beads is a little bit janky (as
+  //// of this writing)
+  //// so it's best to change your default input temporarily, 
+  //// if you want to use a different input
+  //UGen microphoneIn = ac.getAudioInput();
+  //// set up our usual master gain object
+  //Gain g = new Gain(ac, 1, 0.5);
+  //g.addInput(microphoneIn);
+  //ac.out.addInput(g);
+  //ac.start();
+  
+  amp = new Amplitude(this);
+  in = new AudioIn(this, 0);
+  in.start();
+  amp.input(in);
   
 }
 
@@ -70,24 +78,29 @@ void controls() {
     carY = height;
   }
   
-  int vOffset = 0;
-  for(int i = 0; i < width; i++)
-  {
-    // for each pixel, work out where in the current audio 
-    // buffer we are
-    int buffIndex = i * ac.getBufferSize() / width;
-    // then work out the pixel height of the audio data at 
-    // that point
-    vOffset = (int)((1 + ac.out.getValue(0, buffIndex)) *
-    height / 2);
-    
-    //print(vOffset + ","); //debug
-  }
+  String speedStr = nf(amp.analyze(), 0, 4);
+  float speed = float(speedStr) * 10;
+  println(speed);
+  carY = carY - int(speed);
   
-  //moves car forward
-  if ((int) vOffset > 400) {
-      carY = carY - 1;
-   }
+  //int vOffset = 0;
+  //for(int i = 0; i < width; i++)
+  //{
+  //  // for each pixel, work out where in the current audio 
+  //  // buffer we are
+  //  int buffIndex = i * ac.getBufferSize() / width;
+  //  // then work out the pixel height of the audio data at 
+  //  // that point
+  //  vOffset = (int)((1 + ac.out.getValue(0, buffIndex)) *
+  //  height / 2);
+    
+  //  //print(vOffset + ","); //debug
+  //}
+  
+  ////moves car forward
+  //if ((int) vOffset > 400) {
+  //    carY = carY - 1;
+  //}
 }
 
 void startScreen() {
