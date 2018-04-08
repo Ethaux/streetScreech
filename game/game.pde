@@ -1,6 +1,12 @@
 // Street Screech Retro Game
 // LMC 4725
 
+// Frequency Tests
+// 80, 101, 156
+// 54, 85, 257
+// 85, 234, 367
+// 125, 179, 671
+
 //import beads.*;
 import processing.sound.*;
 Amplitude amp;
@@ -23,6 +29,9 @@ float[] spectrum = new float[bands];
 int maxIndex = 0;
 float max = 0.0;
 int freq = 0;
+int[] lowFreqGroup = {90, 120};
+int[] highFreqGroup = {140, 210};
+int[] usedFreqGroup = new int[2];
 
 int click = 0;
 
@@ -37,6 +46,9 @@ void setup() {
   
   carX = width/2 - 17;
   carY = height - car.height;
+  
+  usedFreqGroup[0] = lowFreqGroup[0];
+  usedFreqGroup[1] = lowFreqGroup[1];
   
   ////sound
   //ac = new AudioContext();
@@ -113,10 +125,10 @@ void controls() {
   freq = maxIndex*8000/1024;
   println(freq);
   
-  if(freq <= 90 && freq >= 60) {
-    carDirection -= 5;
-  } else if(freq >= 130 && freq <= 200) {
-    carDirection += 5;
+  if(freq <= usedFreqGroup[0] && freq >= 30) {
+    carDirection -= 3;
+  } else if(freq >= usedFreqGroup[1] && freq <= 700) {
+    carDirection += 3;
   }
   
   //Draw the car
@@ -151,16 +163,23 @@ void startScreen() {
 
   fill(0);
   rect(0, 200, width, 400); //black line for widescreen effect
+
+  textAlign(CENTER);
   
   //main title
   textFont(f, 72);
   fill(255);
-  text("Street Screech", width/2 - 260, height/2);
+  text("Street Screech", width/2, height/2 - 100);
+  
+  //Frequency Group Control instruction
+  textFont(f, 20);
+  fill(255, 255, 0);
+  text("Up arrow key for higher voices, Down arrow key for lower voices", width/2, height/2 + 50);
   
   //instruction
   textFont(f, 32);
   fill(255, 255, 0);
-  text("Click   to   Start", width/2 - 120, height/2 + 75); //leave spacing
+  text("Click to Start", width/2, height/2 + 150); //leave spacing
 }
 
 void firstLevel() {
@@ -170,9 +189,11 @@ void firstLevel() {
 }
 
 void keyPressed() {
-  if(keyCode == LEFT){
-    carDirection -= 5;
-  } else if(keyCode == RIGHT) {
-    carDirection += 5;
+  if(keyCode == UP){
+    usedFreqGroup[0] = highFreqGroup[0];
+    usedFreqGroup[1] = highFreqGroup[1];
+  } else if(keyCode == DOWN) {
+    usedFreqGroup[0] = lowFreqGroup[0];
+    usedFreqGroup[1] = lowFreqGroup[1];
   }
 }
