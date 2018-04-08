@@ -10,8 +10,6 @@ float max = 0.0;
 
 void setup() {
   size(1024, 360);
-  background(255);
-  max = spectrum[0];
     
   // Create an Input stream which is routed into the Amplitude analyzer
   fft = new FFT(this, bands);
@@ -25,19 +23,19 @@ void setup() {
 }      
 
 void draw() { 
-  background(255);
   fft.analyze(spectrum);
   max = spectrum[0];
 
   for(int i = 0; i < bands; i++){
-    // The result of the FFT is normalized
-    // draw the line for frequency band i scaling it up by 5 to get more amplitude.
-    //line( i, height, i, height - spectrum[i]*height*5 );
     if(spectrum[i] > max) {
       max = spectrum[i];
       maxIndex = i;
     }
   }
   
-  println(maxIndex*44100/1024);
+  println(maxIndex*8000/1024);
 }
+
+// 818, 904, 3229
+// 732, 1033, 1300-1500+
+// 430, 600, 775 || 80, 101, 156

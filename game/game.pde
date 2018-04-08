@@ -1,11 +1,13 @@
 // Street Screech Retro Game
 // LMC 4725
 
-import beads.*;
+//import beads.*;
 import processing.sound.*;
 Amplitude amp;
 AudioIn in;
-AudioContext ac;
+AudioIn fftIn;
+FFT fft;
+//AudioContext ac;
 PFont f;
 
 PImage map;
@@ -15,6 +17,12 @@ float carY = 0;
 float carDirection = 0;
 String speedStr = "";
 float speed = 0.0;
+
+int bands = 2048;
+float[] spectrum = new float[bands];
+int maxIndex = 0;
+float max = 0.0;
+int freq = 0;
 
 int click = 0;
 
@@ -46,11 +54,14 @@ void setup() {
   //ac.out.addInput(g);
   //ac.start();
   
+  fft = new FFT(this, bands);
   amp = new Amplitude(this);
   in = new AudioIn(this, 0);
   in.start();
+  fftIn = new AudioIn(this, 0);
+  fftIn.start();
   amp.input(in);
-  
+  fft.input(fftIn);
 }
 
 void draw() {
@@ -81,11 +92,39 @@ void controls() {
     carY = height;
   }
   
+  //Forward Speed
   speedStr = nf(amp.analyze(), 0, 4);
   speed = float(speedStr) * 10;
   //println(speed);
   carX = carX + speed*sin(radians(carDirection));
   carY = carY - speed*cos(radians(carDirection));
+  
+  //Rotation Speed
+  fft.analyze(spectrum);
+  max = spectrum[0];
+
+  for(int i = 0; i < bands; i++){
+    if(spectrum[i] > max) {
+      max = spectrum[i];
+      maxIndex = i;
+    }
+  }
+  
+  freq = maxIndex*8000/1024;
+  println(freq);
+  
+  if(freq <= 90 && freq >= 60) {
+    carDirection -= 5;
+  } else if(freq >= 130 && freq <= 200) {
+    carDirection += 5;
+  }
+  
+  //Draw the car
+  pushMatrix();
+  translate(carX+car.width/2, carY+car.height/2);
+  rotate(radians(carDirection));
+  image(car, -car.width/2, -car.height/2);
+  popMatrix();
   
   //int vOffset = 0;
   //for(int i = 0; i < width; i++)
@@ -105,12 +144,6 @@ void controls() {
   //if ((int) vOffset > 400) {
   //    carY = carY - 1;
   //}
-  
-  pushMatrix();
-  translate(carX+car.width/2, carY+car.height/2);
-  rotate(radians(carDirection));
-  image(car, -car.width/2, -car.height/2);
-  popMatrix();
 }
 
 void startScreen() {
