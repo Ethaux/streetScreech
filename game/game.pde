@@ -47,8 +47,8 @@ void setup() {
   carX = width/2 - 17;
   carY = height - car.height;
   
-  usedFreqGroup[0] = lowFreqGroup[0];
-  usedFreqGroup[1] = lowFreqGroup[1];
+  usedFreqGroup[0] = 90;
+  usedFreqGroup[1] = 130;
   
   ////sound
   //ac = new AudioContext();
@@ -190,10 +190,10 @@ void firstLevel() {
 
 void keyPressed() {
   if(keyCode == UP){
-    usedFreqGroup[0] = highFreqGroup[0];
-    usedFreqGroup[1] = highFreqGroup[1];
+    usedFreqGroup[0] += 10;
+    usedFreqGroup[1] += 10;
   } else if(keyCode == DOWN) {
-    usedFreqGroup[0] = lowFreqGroup[0];
-    usedFreqGroup[1] = lowFreqGroup[1];
+    usedFreqGroup[0] -= 10;
+    usedFreqGroup[1] -= 10;
   }
 }
