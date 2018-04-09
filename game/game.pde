@@ -16,8 +16,18 @@ FFT fft;
 //AudioContext ac;
 PFont f;
 
-PImage map;
+PImage map1;
+PImage map2;
+PImage map3;
 PImage car;
+PImage cow1;
+PImage cow2;
+
+//car position
+int carXPos = 0;
+int carYPos = 0;
+
+//car speed
 float carX = 0;
 float carY = 0;
 float carDirection = 0;
@@ -41,11 +51,17 @@ void setup() {
   f = createFont("ArcadeClassic",16,true); // Helvetica, 16 point, anti-aliasing on
   
   // load images
-  map = loadImage("map1.png");
+  map1 = loadImage("map1.png");
+  map2 = loadImage("map2.png");
+  map3 = loadImage("map3.png");
   car = loadImage("Ferrari.png"); //main car sprite
+  cow1 = loadImage("cow1.png");
+  cow2 = loadImage("cow2.png");
   
   carX = width/2 - 17;
   carY = height - car.height;
+  carXPos = (int) carX;
+  carYPos = (int) carY;
   
   usedFreqGroup[0] = 90;
   usedFreqGroup[1] = 130;
@@ -82,7 +98,7 @@ void draw() {
     startScreen();
   }
   else {
-    firstLevel();
+    goToLevel();
   }
   
   //click counter
@@ -92,18 +108,7 @@ void draw() {
 }
 
 //change controls from mouse to voice
-void controls() {
-  // car moves forward
-  //if (mousePressed) {
-  //  carY--;
-  //}
-  
-  //if car goes out of screen
-  if (carY + car.height < 0) {
-    //loops the car once out of screen
-    carY = height;
-  }
-  
+void controls() {  
   //Forward Speed
   speedStr = nf(amp.analyze(), 0, 4);
   speed = float(speedStr) * 10;
@@ -123,7 +128,7 @@ void controls() {
   }
   
   freq = maxIndex*8000/1024;
-  println(freq);
+  //println(freq);
   
   if(freq <= usedFreqGroup[0] && freq >= 30) {
     carDirection -= 3;
@@ -133,10 +138,25 @@ void controls() {
   
   //Draw the car
   pushMatrix();
-  translate(carX+car.width/2, carY+car.height/2);
+  carXPos = (int) (carX + car.width/2);
+  carYPos = (int) (carY + car.height/2);
+  
+  translate(carXPos, carYPos);
   rotate(radians(carDirection));
   image(car, -car.width/2, -car.height/2);
   popMatrix();
+  
+  //bounds of screen
+  if (carYPos > height) {
+    carYPos = height - car.height;
+  } else if (carXPos < 0) {
+    carXPos = 0;
+  } else if (carXPos > width) {
+    carXPos = width - car.height;
+  } else if (carYPos < 0 && (carXPos < 400 || carXPos > 500)) {
+    carYPos = 0;
+  }
+  
   
   //int vOffset = 0;
   //for(int i = 0; i < width; i++)
@@ -167,24 +187,92 @@ void startScreen() {
   textAlign(CENTER);
   
   //main title
-  textFont(f, 72);
-  fill(255);
-  text("Street Screech", width/2, height/2 - 100);
+  textFont(f, 78);
+  fill(255, 255, 0);
+  text("Street Screech", width/2, height/2 - 80);
   
   //Frequency Group Control instruction
-  textFont(f, 20);
-  fill(255, 255, 0);
-  text("Up arrow key for higher voices, Down arrow key for lower voices", width/2, height/2 + 50);
-  
-  //instruction
   textFont(f, 32);
-  fill(255, 255, 0);
-  text("Click to Start", width/2, height/2 + 150); //leave spacing
+  fill(255);
+  //leave extra space between words for regular spacing
+  text("Press  up  arrow  key  for  higher  voices", width/2, height/2 + 90);
+  text("Press  down  arrow  for  lower  voices", width/2, height/2 + 130);
+  
+  //General instruction
+  textFont(f, 50);
+  fill(255, 255, 0); //yellow
+  text("Click  to  Start", width/2, height/2 + 10); //leave spacing
+}
+
+void goToLevel() {
+  if (click == 1) {
+    firstLevel();
+    
+    if (carYPos < 0) {
+      secondLevel();
+      
+      //bounds
+      if (carYPos > height) {
+        carYPos = height - car.height;
+      } else if (carXPos < 0) {
+        carXPos = 0;
+      } else if (carXPos > width) {
+        carXPos = width - car.height;
+      } else if (carYPos < 0 && (carXPos < 400 || carXPos > 500)) {
+        carYPos = 0;
+      }
+      
+      if (carY < 0) {
+        thirdLevel();
+      }
+    }
+  }
+  
+  println("CarX Pos: " + carXPos + ", CarY Pos: " + carYPos + ", Freq: " + freq);
 }
 
 void firstLevel() {
-  image(map, 0, 0); //first level bg
-  //image(car, carX, carY);
+  image(map1, 0, 0); //first level bg
+  
+  pushMatrix();
+  carXPos = (int) (carX + car.width/2);
+  carYPos = (int) (carY + car.height/2);
+  
+  translate(carXPos, carYPos);
+  rotate(radians(carDirection));
+  image(car, -car.width/2, -car.height/2);
+  popMatrix();
+  
+  controls();
+}
+
+void secondLevel() {
+  image(map2, 0, 0);
+  pushMatrix();
+  carXPos = (int) (carX + car.width/2 + 90);
+  carYPos = (int) (carY + car.height/2);
+  
+  translate(carXPos, carYPos);
+  rotate(radians(carDirection));
+  image(car, -car.width/2, -car.height/2);
+  popMatrix();
+  
+  controls();
+
+}
+
+void thirdLevel() {
+  image(map3, 0, 0);
+  
+  pushMatrix();
+  carXPos = (int) (carX + car.width/2 - 300);
+  carYPos = (int) (carY + car.height/2);
+  
+  translate(carXPos, carYPos);
+  rotate(radians(carDirection));
+  image(car, -car.width/2, -car.height/2);
+  popMatrix();
+  
   controls();
 }
 
