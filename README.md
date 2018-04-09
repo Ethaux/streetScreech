@@ -1,3 +1,3 @@
 # streetScreech
 
-Main game located in game folder.
+Executable file located in game folder.
