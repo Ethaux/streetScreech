@@ -44,6 +44,7 @@ int[] highFreqGroup = {140, 210};
 int[] usedFreqGroup = new int[2];
 
 int click = 0;
+int level;
 
 void setup() {
   size(900,800);
@@ -65,6 +66,8 @@ void setup() {
   
   usedFreqGroup[0] = 90;
   usedFreqGroup[1] = 130;
+  
+  level = 1;
   
   ////sound
   //ac = new AudioContext();
@@ -113,8 +116,14 @@ void controls() {
   speedStr = nf(amp.analyze(), 0, 4);
   speed = float(speedStr) * 10;
   //println(speed);
-  carX = carX + speed*sin(radians(carDirection));
-  carY = carY - speed*cos(radians(carDirection));
+  float xTemp = carX + speed*sin(radians(carDirection));
+  float yTemp = carY - speed*cos(radians(carDirection));
+  if(xTemp > 0 && xTemp < width) {
+    carX = carX + speed*sin(radians(carDirection));
+  }
+  if(yTemp < height) {
+    carY = carY - speed*cos(radians(carDirection));
+  }
   
   //Rotation Speed
   fft.analyze(spectrum);
@@ -130,7 +139,7 @@ void controls() {
   freq = maxIndex*8000/1024;
   //println(freq);
   
-  if(freq <= usedFreqGroup[0] && freq >= 30) {
+  if(freq <= usedFreqGroup[0] && freq >= 40) {
     carDirection -= 3;
   } else if(freq >= usedFreqGroup[1] && freq <= 700) {
     carDirection += 3;
@@ -206,25 +215,31 @@ void startScreen() {
 
 void goToLevel() {
   if (click == 1) {
-    firstLevel();
+    if(level == 1) {
+      firstLevel();
+    }
     
-    if (carYPos < 0) {
+    if (carYPos < 0 && level == 1) {
+      level++;
       secondLevel();
       
-      //bounds
-      if (carYPos > height) {
-        carYPos = height - car.height;
-      } else if (carXPos < 0) {
-        carXPos = 0;
-      } else if (carXPos > width) {
-        carXPos = width - car.height;
-      } else if (carYPos < 0 && (carXPos < 400 || carXPos > 500)) {
-        carYPos = 0;
-      }
-      
-      if (carY < 0) {
-        thirdLevel();
-      }
+      carX = carX + car.width/2 + 55;
+      carY = height - car.height;
+    }
+    
+    if (carY > 0 && level == 2) {
+      secondLevel();
+    }
+    
+    if (carY < 0 && level == 2) {
+      level++;
+      thirdLevel();
+      carX = 135;
+      carY = height - car.height;
+    }
+    
+    if (level == 3) {
+      thirdLevel();
     }
   }
   
@@ -240,7 +255,6 @@ void firstLevel() {
   
   translate(carXPos, carYPos);
   rotate(radians(carDirection));
-  image(car, -car.width/2, -car.height/2);
   popMatrix();
   
   controls();
@@ -254,7 +268,6 @@ void secondLevel() {
   
   translate(carXPos, carYPos);
   rotate(radians(carDirection));
-  image(car, -car.width/2, -car.height/2);
   popMatrix();
   
   controls();
@@ -270,7 +283,6 @@ void thirdLevel() {
   
   translate(carXPos, carYPos);
   rotate(radians(carDirection));
-  image(car, -car.width/2, -car.height/2);
   popMatrix();
   
   controls();
