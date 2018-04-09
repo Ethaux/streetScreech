@@ -288,6 +288,22 @@ void thirdLevel() {
   controls();
 }
 
+void win() {
+  background(0);
+  cow1.resize(300,200);
+  image(cow1, width/2 - 150, height/2 - 200);
+  
+  textAlign(CENTER);
+  
+  textFont(f, 78);
+  fill(255, 255, 0);
+  text("You  Win!", width/2, height/2 + 120);
+  
+  textFont(f, 50);
+  fill(255);
+  text("You're  finally  home", width/2, height/2 + 200);
+}
+
 void keyPressed() {
   if(keyCode == UP){
     usedFreqGroup[0] += 10;
